@@ -6,8 +6,6 @@
 #v0.5 python2.7 add https://bt.aisex.com
 
 from bs4 import BeautifulSoup
-#import urllib2
-#import urllib
 import time,os
 import getpagelink3, gettorrentlink3, gettorrent3
 import bencode  #解码torrent
@@ -88,10 +86,16 @@ def main():
             b = {'link':tResDict['btCode'],'ofile':str(tResDict['title'])+'.torrent','oDir':str(torrentsPath + r'/' +tResDict['title'])}
             btsList.append(b)
 
-    print(imgsList)
+    for item in imgsList:
+        print(item)
+    print()
+    for item in btsList:
+        print(item)
+    print()
 
-##    getFiles(fileList=btsList,m='p')
     getFiles(fileList=imgsList,m='g')
+    getFiles(fileList=btsList,m='p')
+
 
 
 ##    n = 0
