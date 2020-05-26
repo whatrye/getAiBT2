@@ -45,8 +45,8 @@ def getlink_list(my_page='https://www.aisex.com/bt/thread.php?fid=16&page=1',pag
                     #print 'the href is: %s' %unicode(mytag_href)
                     myfull_link = page_prefix + mytag_href #内容页全地址full_Url
                     link_list.append(myfull_link)
-                    #mytorrent_filename = removeSstr(mytag_string)
-                    mytorrent_filename = refineString(mytag_string)
+                    mytorrent_filename = removeSstr(mytag_string)
+                    mytorrent_filename = refineString(mytorrent_filename)
                     linksList.append({'title':mytorrent_filename,'link':myfull_link})
                     n = n+1
                     print('    ',n,'Refined Title: ',mytorrent_filename)
