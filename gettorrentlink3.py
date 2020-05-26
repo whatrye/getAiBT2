@@ -5,6 +5,7 @@
 
 from bs4 import BeautifulSoup
 import requests
+from pStr3 import removeSstr,refineString
 
 def get_torrentlink(myreq_url='https://bt.aisex.com/bt/htm_data/16/1609/860163.html',enable_proxy = False, proxy_string = {"http":"127.0.0.1:8787","https":"127.0.0.1:8787","socks":"127.0.0.1:1080"}):
     "从指定的网页中获取torrent的代码"
@@ -14,8 +15,8 @@ def get_torrentlink(myreq_url='https://bt.aisex.com/bt/htm_data/16/1609/860163.h
     except Exception as e:
         print('error:',e)
         
-
-    soup = BeautifulSoup(r1.content,'html.parser')
+    content1 = r1.content.decode("gbk","ignore")
+    soup = BeautifulSoup(content1,'html.parser')
     tCode = 'notExist'
 
     #锚点A没被放在img标签里的
@@ -69,6 +70,7 @@ def get_torrentlink(myreq_url='https://bt.aisex.com/bt/htm_data/16/1609/860163.h
     title = ''
     title = soup.find('h1',id = 'subject_tpc').next_element #或者.get_text() 或者.text 或者.innerHTML 或者.innerText
     title = title.strip()
+    title = refineString(title)
     tRes = {'btCode':tCode,'title':title,'imgsList':imgsList}
     #tRes.append({'btCode':tCode,'title':title,'imgsList':imgsList})
 

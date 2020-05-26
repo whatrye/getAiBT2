@@ -74,18 +74,23 @@ def main():
     '''
     btsList = []
     imgsList = []
+    n = 0
     for tp in linksList:
-        tResDict = gettorrentlink3.get_torrentlink(myreq_url = tp['link'], enable_proxy = enable_proxy, proxy_string = proxy_string)
+        n=n+1
+        print(n,tp['link'])
+        tResDict = gettorrentlink3.get_torrentlink(myreq_url = str(tp['link']), enable_proxy = enable_proxy, proxy_string = proxy_string)
         for imgLink in tResDict['imgsList']:
             outfilename =imgLink[imgLink.rfind('/')+1:len(imgLink)]
-            a = {'link':imgLink,'ofile':outfilename,'oDir':torrentsPath + r'/' +tResDict['title']}
+            a = {'link':imgLink,'ofile':outfilename,'oDir':str(torrentsPath + r'/' +tResDict['title'])}
             imgsList.append(a)
 
         if tResDict['btCode'] != 'notExist':
-            b = {'link':tResDict['btCode'],'ofile':tResDict['title']+'.torrent','oDir':torrentsPath + r'/' +tResDict['title']}
+            b = {'link':tResDict['btCode'],'ofile':str(tResDict['title'])+'.torrent','oDir':str(torrentsPath + r'/' +tResDict['title'])}
             btsList.append(b)
 
-    getFiles(fileList=btsList,m='p')
+    print(imgsList)
+
+##    getFiles(fileList=btsList,m='p')
     getFiles(fileList=imgsList,m='g')
 
 

@@ -4,7 +4,7 @@
 #获取torrent的相关图片
 
 from bs4 import BeautifulSoup
-import requests,queue,threading
+import requests,queue,threading,os
 
 filesQueue = queue.Queue()
 
@@ -14,6 +14,7 @@ def getFile(fileLink,fileName,outdir,enable_proxy = False, m = "g",tcode = 'vic8
     timeout = 15
     picFilename = ''
     picFilename = fileName
+    print(m)
 
     headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36'}
     
@@ -24,21 +25,26 @@ def getFile(fileLink,fileName,outdir,enable_proxy = False, m = "g",tcode = 'vic8
     if not os.path.exists(outdir):
         os.makedirs(outdir)
 ##    outfile_full_path = str(outdir + r'/' + outfile_name)
-    
+    picFullpath = str(outdir + r'/' + picFilename)
+    print(picFullpath)
     try:
         if m == 'p':
             tcode = fileLink
             formdata={'code':tcode}
+            print('start get ',tcode)
             r1 = requests.post('http://www.jandown.com/fetch.php',data = formdata, headers = headers)
             if b'<html>' in r1.content:
                 r1.content = ''
                 print('not torrent')
+            else:
+                print('good')
         else:
+            print('start get img ',picFilename)
             r1 = requests.get(fileLink, headers = headers,proxies = proxies,timeout = timeout)
             
         imgContent = r1.content
         if len(imgContent) > 0:
-            picFullpath = (outdir + r'/' + picFilename)
+##            picFullpath = str(outdir + r'/' + picFilename)
             ofile = open(picFullpath,'wb')
             ofile.write(imgContent)
             ofile.close()
@@ -51,13 +57,14 @@ def getFileT(myQueue,m,enable_proxy = False, proxy_string = {"http":"127.0.0.1:8
     "线程函数"
     proxies = {}
     timeout = 15
+    print(m)
 ##    picFilename = ''
 
     imgLink = myQueue.get_nowait()
 ##    picFilename = imgLink[imgLink.rfind('/')+1:len(imgLink)]
 
     try:
-        getFile(fileLink=imgLink['link'],filename=imgLink['ofile'],outdir=imgLink['oDir'],m=m)
+        getFile(fileLink=imgLink['link'],fileName=imgLink['ofile'],outdir=imgLink['oDir'],m=m)
     except Exception as e:
         print('error:',e)
 
