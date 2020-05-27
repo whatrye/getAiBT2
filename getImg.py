@@ -60,7 +60,7 @@ def getImgT(myQueue,outpath,enable_proxy = False, proxy_string = {"http":"127.0.
 def getImgs(imgList,outpath):
     for item in imgList:
         imgQueue.put(item)
-    threadN = 10
+    threadN = 100
     jqueue = imgQueue.qsize()
     if jqueue < threadN:
         threadN = jqueue

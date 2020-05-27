@@ -8,13 +8,14 @@ import requests,queue,threading,os
 
 filesQueue = queue.Queue()
 
-def getFile(fileLink,fileName,outdir,enable_proxy = False, m = "g",tcode = 'vic8w2AM', proxy_string = {"http":"127.0.0.1:8787","https":"127.0.0.1:8787","socks":"127.0.0.1:1080"}):
+def getFile(fileLink, fileName, outdir, m = 'g', enable_proxy = False, tcode = 'vic8w2AM', proxy_string = {"http":"127.0.0.1:8787","https":"127.0.0.1:8787","socks":"127.0.0.1:1080"}):
     "下载单独文件"
     proxies = {}
     timeout = 15
     picFilename = ''
     picFilename = fileName
-    print(m)
+
+    #print(m)
 
     headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36'}
     
@@ -32,17 +33,26 @@ def getFile(fileLink,fileName,outdir,enable_proxy = False, m = "g",tcode = 'vic8
         if m == 'p':
             tcode = fileLink
             formdata={'code':tcode}
-            print('start get torrent',tcode)
-            r1 = requests.post('http://www.jandown.com/fetch.php',data = formdata, headers = headers)
+            #print('start get torrent',tcode)
+            try:
+                r1 = requests.post('http://www.jandown.com/fetch.php',data = formdata, headers = headers)
+            except Exception as e:
+                print('error:',e)
+                return 2
             if b'<html>' in r1.content:
                 #r1.content = b''
-                print('not torrent')
+                save = 0
+                #print('not torrent')
             else:
-                save =1
-                print('good')
-        else:
-            print('start get img ',picFilename)
-            r1 = requests.get(fileLink, headers = headers,proxies = proxies,timeout = timeout)
+                save = 1
+                #print('good')
+        elif m == 'g':
+            #print('start get img ',picFilename)
+            try:
+                r1 = requests.get(fileLink, headers = headers,proxies = proxies,timeout = timeout)
+            except Exception as e:
+                print('error:',e)
+                return 3
             save = 1
             
         imgContent = r1.content
@@ -56,6 +66,8 @@ def getFile(fileLink,fileName,outdir,enable_proxy = False, m = "g",tcode = 'vic8
                 ofile.close()
     except Exception as e:
         print('error:',e)
+        return 4
+    return 1
 
 ##    return picFilename,content
 
@@ -63,33 +75,41 @@ def getFileT(myQueue,m,enable_proxy = False, proxy_string = {"http":"127.0.0.1:8
     "线程函数"
     proxies = {}
     timeout = 15
-    print(m)
+
+    #print(m)
 ##    picFilename = ''
 
-    imgLink = myQueue.get_nowait()
+    while True:
+        try:
+            imgLink = myQueue.get_nowait()
+            j = myQueue.qsize()
+        except Exception as e:
+            break
+        
 ##    picFilename = imgLink[imgLink.rfind('/')+1:len(imgLink)]
+        try:
+            getFile(fileLink=imgLink['link'],fileName=imgLink['ofile'],outdir=imgLink['oDir'],m=m)
+        except Exception as e:
+            print('error:',e)
 
-    try:
-        getFile(fileLink=imgLink['link'],fileName=imgLink['ofile'],outdir=imgLink['oDir'],m=m)
-    except Exception as e:
-        print('error:',e)
 
 def getFiles(fileList,m):
     #fileList:[{'link':fullurl,'ofile':outPutfilename,'oDir':outdir},]
     for item in fileList:
         filesQueue.put(item)
-    threadN = 10
+    threadN = 100
     jqueue = filesQueue.qsize()
     if jqueue < threadN:
         threadN = jqueue
 
-    threads = []
-    for i in range(0,threadN):
-        thread = threading.Thread(target = getFileT, args = (filesQueue,m,))
-        threads.append(thread)
-        thread.start()
-    for thread1 in threads:
-        thread1.join()
+    if jqueue > 0:
+        threads = []
+        for i in range(0,threadN):
+            thread = threading.Thread(target = getFileT, args = (filesQueue,m,))
+            threads.append(thread)
+            thread.start()
+        for thread1 in threads:
+            thread1.join()
 
 if __name__ == '__main__':
     outfilename,imgContent = getFile()
