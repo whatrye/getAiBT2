@@ -5,15 +5,18 @@
 #获取帖子列表网页中的每个帖子的链接
 #v0.5 python2.7 add https://bt.aisex.com
 
-from bs4 import BeautifulSoup
 import time,os
-import getpagelink3, gettorrentlink3, gettorrent3
-import bencode  #解码torrent
+from importlib import reload
 from colorama import init,Fore,Back,Style #控制台彩色输出用
+from bs4 import BeautifulSoup
+import bencode  #解码torrent
 import io, sys, re
-from imp import reload
+import queue,threading
+
+import getpagelink3, gettorrentlink3, gettorrent3
 from getImg import getImg,getImgs
 from getFiles import getFiles
+
 
 headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36'}
 
@@ -70,10 +73,14 @@ def main():
     print Fore.YELLOW + 'link_dict length is: '+str(len(link_dict)) + '\n'
     print Fore.CYAN + 'Total links: ', link_count, '\n'
     '''
-    btsList = []
-    imgsList = []
+    
+    #顺序下载方式-------start-------------
+##    btsList = []
+##    imgsList = []
     n = 0
     for tp in linksList:
+        btsList = []
+        imgsList = []
         n=n+1
         print(n,tp['link'])
         tResDict = gettorrentlink3.get_torrentlink(myreq_url = str(tp['link']), enable_proxy = enable_proxy, proxy_string = proxy_string)
@@ -81,22 +88,28 @@ def main():
             outfilename =imgLink[imgLink.rfind('/')+1:len(imgLink)]
             a = {'link':imgLink,'ofile':outfilename,'oDir':str(torrentsPath + r'/' +tResDict['title'])}
             imgsList.append(a)
-
         if tResDict['btCode'] != 'notExist':
             b = {'link':tResDict['btCode'],'ofile':str(tResDict['title'])+'.torrent','oDir':str(torrentsPath + r'/' +tResDict['title'])}
             btsList.append(b)
+            
+        if len(imgsList) >0:
+            getFiles(fileList=imgsList,m='g')
+        if len(btsList) >0:
+            print(len(btsList))
+            getFiles(fileList=btsList,m='p')
 
-    for item in imgsList:
-        print(item)
-    print()
-    for item in btsList:
-        print(item)
-    print()
+##    for item in imgsList:
+##        print(item)
+##    print()
+##    for item in btsList:
+##        print(item)
+##    print()
 
-    getFiles(fileList=imgsList,m='g')
-    getFiles(fileList=btsList,m='p')
-
-
+##    if len(imgsList) >0:
+##        getFiles(fileList=imgsList,m='g')
+##    if len(btsList) >0:
+##        getFiles(fileList=btsList,m='p')
+      #顺序下载方式-------End-------------
 
 ##    n = 0
 ##    link_nu = 1

@@ -21,33 +21,39 @@ def getFile(fileLink,fileName,outdir,enable_proxy = False, m = "g",tcode = 'vic8
 ##    outfile_name = str(btItem['title'] + '.torrent')
 ##    outfile_name = fileName
 ##    outdir = str(torrentsPath + r'/' + btItem['title'])
-    outdir = outdir
-    if not os.path.exists(outdir):
-        os.makedirs(outdir)
+    outdir1 = outdir
+    if not os.path.exists(outdir1):
+        os.makedirs(outdir1)
 ##    outfile_full_path = str(outdir + r'/' + outfile_name)
-    picFullpath = str(outdir + r'/' + picFilename)
+    picFullpath = str(outdir1 + r'/' + picFilename)
     print(picFullpath)
     try:
+        save = 0
         if m == 'p':
             tcode = fileLink
             formdata={'code':tcode}
-            print('start get ',tcode)
+            print('start get torrent',tcode)
             r1 = requests.post('http://www.jandown.com/fetch.php',data = formdata, headers = headers)
             if b'<html>' in r1.content:
-                r1.content = ''
+                #r1.content = b''
                 print('not torrent')
             else:
+                save =1
                 print('good')
         else:
             print('start get img ',picFilename)
             r1 = requests.get(fileLink, headers = headers,proxies = proxies,timeout = timeout)
+            save = 1
             
         imgContent = r1.content
-        if len(imgContent) > 0:
+        if len(imgContent) > 0 and save == 1:
 ##            picFullpath = str(outdir + r'/' + picFilename)
-            ofile = open(picFullpath,'wb')
-            ofile.write(imgContent)
-            ofile.close()
+            if os.path.exists(picFullpath) and os.path.isfile(picFullpath) and os.access(picFullpath,os.R_OK):
+                print('file exist, skip')
+            else:
+                ofile = open(picFullpath,'wb')
+                ofile.write(imgContent)
+                ofile.close()
     except Exception as e:
         print('error:',e)
 
