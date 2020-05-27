@@ -23,8 +23,9 @@ def getFile(fileLink, fileName, outdir, m = 'g', enable_proxy = False, tcode = '
 ##    outfile_name = fileName
 ##    outdir = str(torrentsPath + r'/' + btItem['title'])
     outdir1 = outdir
-    if not os.path.exists(outdir1):
-        os.makedirs(outdir1)
+##    if not os.path.exists(outdir1):
+##        os.makedirs(outdir1)
+    os.makedirs(outdir1, exist_ok=True)
 ##    outfile_full_path = str(outdir + r'/' + outfile_name)
     picFullpath = str(outdir1 + r'/' + picFilename)
     print(picFullpath)
