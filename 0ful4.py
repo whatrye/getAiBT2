@@ -11,7 +11,6 @@ from colorama import init,Fore,Back,Style #控制台彩色输出用
 from bs4 import BeautifulSoup
 import bencode  #解码torrent
 import io, sys, re
-import queue,threading
 
 import getpagelink3, gettorrentlink3, gettorrent3
 from getImg import getImg,getImgs

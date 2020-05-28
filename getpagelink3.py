@@ -12,7 +12,7 @@ pattern2 = re.compile("[.*G]")
 headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36'}
 
 def getlink_list(my_page='https://www.aisex.com/bt/thread.php?fid=16&page=1',page_host = u'www.aisex.com',enable_proxy = False, proxy_string = {"http":"127.0.0.1:8787","https":"127.0.0.1:8787","socks":"127.0.0.1:1080"}):
-    "获取网页中帖子链接的列表"
+    "获取单个索引网页中帖子链接的列表"
 
     page_prefix = "https://www.aisex.com/bt/"
     #page_no = "1"
@@ -56,6 +56,7 @@ def getlink_list(my_page='https://www.aisex.com/bt/thread.php?fid=16&page=1',pag
     return linksList,link_dict
 
 def getLinksLists(indexPageS = 1,indexPageC = 2):
+    "获取所有索引网页中帖子链接的列表"
     prePage = 'https://bt.aisex.com/bt/thread.php?fid=16&page='
     linksList = [] #内容 {'title':torrenttitle,'link':btpagefull_link}
     for pageN in range(indexPageS,indexPageS+indexPageC):
