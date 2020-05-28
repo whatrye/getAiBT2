@@ -8,6 +8,9 @@ import requests,queue,threading,os
 from concurrent.futures import  ThreadPoolExecutor
 
 filesQueue = queue.Queue()
+##lock = threading.Lock()
+##lock.acquire()
+##lock.release()
 
 def getFile(ft, m = 'g', enable_proxy = False, tcode = 'vic8w2AM', proxy_string = {"http":"127.0.0.1:8787","https":"127.0.0.1:8787","socks":"127.0.0.1:1080"}):
     "下载单独文件"
@@ -113,7 +116,7 @@ def getFiles(fileList,m):
 ##        for thread1 in threads:
 ##            thread1.join()
 
-    with ThreadPoolExecutor(10) as pool:
+    with ThreadPoolExecutor(max_workers=50) as pool:
         [pool.submit(getFile,item,m) for item in fileList]
 
 if __name__ == '__main__':
