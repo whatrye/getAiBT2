@@ -5,16 +5,17 @@
 
 from bs4 import BeautifulSoup
 import requests,queue,threading,os
+from concurrent.futures import  threadPoolExecutor
 
 filesQueue = queue.Queue()
 
-def getFile(fileLink, fileName, outdir, m = 'g', enable_proxy = False, tcode = 'vic8w2AM', proxy_string = {"http":"127.0.0.1:8787","https":"127.0.0.1:8787","socks":"127.0.0.1:1080"}):
+def getFile(ft, m = 'g', enable_proxy = False, tcode = 'vic8w2AM', proxy_string = {"http":"127.0.0.1:8787","https":"127.0.0.1:8787","socks":"127.0.0.1:1080"}):
     "下载单独文件"
     proxies = {}
     timeout = 15
     picFilename = ''
-    picFilename = fileName
-
+    picFilename = ft['ofile']
+    fileLink = ft['link']
     #print(m)
 
     headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36'}
@@ -22,7 +23,7 @@ def getFile(fileLink, fileName, outdir, m = 'g', enable_proxy = False, tcode = '
 ##    outfile_name = str(btItem['title'] + '.torrent')
 ##    outfile_name = fileName
 ##    outdir = str(torrentsPath + r'/' + btItem['title'])
-    outdir1 = outdir
+    outdir1 = ft['oDir']
 ##    if not os.path.exists(outdir1):
 ##        os.makedirs(outdir1)
     os.makedirs(outdir1, exist_ok=True)
@@ -96,21 +97,24 @@ def getFileT(myQueue,m,enable_proxy = False, proxy_string = {"http":"127.0.0.1:8
 
 def getFiles(fileList,m):
     #fileList:[{'link':fullurl,'ofile':outPutfilename,'oDir':outdir},]
-    for item in fileList:
-        filesQueue.put(item)
-    threadN = 100
-    jqueue = filesQueue.qsize()
-    if jqueue < threadN:
-        threadN = jqueue
+##    for item in fileList:
+##        filesQueue.put(item)
+##    threadN = 100
+##    jqueue = filesQueue.qsize()
+##    if jqueue < threadN:
+##        threadN = jqueue
+##
+##    if jqueue > 0:
+##        threads = []
+##        for i in range(0,threadN):
+##            thread = threading.Thread(target = getFileT, args = (filesQueue,m,))
+##            threads.append(thread)
+##            thread.start()
+##        for thread1 in threads:
+##            thread1.join()
 
-    if jqueue > 0:
-        threads = []
-        for i in range(0,threadN):
-            thread = threading.Thread(target = getFileT, args = (filesQueue,m,))
-            threads.append(thread)
-            thread.start()
-        for thread1 in threads:
-            thread1.join()
+    with threadPoolExecutor(10) as pool:
+        [pool.submit(getFile,item,m) for item in fileList]
 
 if __name__ == '__main__':
     outfilename,imgContent = getFile()

@@ -7,7 +7,7 @@
 import requests,queue,threading
 
 import gettorrentlink3
-from getFiles import getFiles
+from getFiles2 import getFiles
 
 linksQueue = queue.Queue()
 
