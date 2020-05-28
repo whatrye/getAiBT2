@@ -5,7 +5,7 @@
 
 from bs4 import BeautifulSoup
 import requests,queue,threading,os
-from concurrent.futures import  threadPoolExecutor
+from concurrent.futures import  ThreadPoolExecutor
 
 filesQueue = queue.Queue()
 
@@ -113,7 +113,7 @@ def getFiles(fileList,m):
 ##        for thread1 in threads:
 ##            thread1.join()
 
-    with threadPoolExecutor(10) as pool:
+    with ThreadPoolExecutor(10) as pool:
         [pool.submit(getFile,item,m) for item in fileList]
 
 if __name__ == '__main__':
