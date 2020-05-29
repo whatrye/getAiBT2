@@ -1,19 +1,24 @@
 #! python3
 # -*- coding: UTF-8 -*-
 #coding: UTF-8
-#获取torrent的相关图片
+#获取torrent及相关图片
+#使用ThreadPoolExecutor替代threading，以简化代码
 
-from bs4 import BeautifulSoup
-import requests,queue,threading,os
-from concurrent.futures import  ThreadPoolExecutor
+#from bs4 import BeautifulSoup
+import os,requests
+#import queue,threading
+from concurrent.futures import ThreadPoolExecutor
 
-filesQueue = queue.Queue()
+#filesQueue = queue.Queue()
 ##lock = threading.Lock()
 ##lock.acquire()
 ##lock.release()
 
 def getFile(ft, m = 'g', enable_proxy = False, tcode = 'vic8w2AM', proxy_string = {"http":"127.0.0.1:8787","https":"127.0.0.1:8787","socks":"127.0.0.1:1080"}):
     "下载单独文件"
+    #ft: {'link':fullurl,'ofile':outPutfilename,'oDir':outdir}
+    #m:请求方式 "g"et 或者 "p"ost
+    
     proxies = {}
     timeout = 15
     picFilename = ''
@@ -22,17 +27,12 @@ def getFile(ft, m = 'g', enable_proxy = False, tcode = 'vic8w2AM', proxy_string 
     #print(m)
 
     headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36'}
-    
-##    outfile_name = str(btItem['title'] + '.torrent')
-##    outfile_name = fileName
-##    outdir = str(torrentsPath + r'/' + btItem['title'])
+
     outdir1 = ft['oDir']
-##    if not os.path.exists(outdir1):
-##        os.makedirs(outdir1)
     os.makedirs(outdir1, exist_ok=True)
-##    outfile_full_path = str(outdir + r'/' + outfile_name)
     picFullpath = str(outdir1 + r'/' + picFilename)
     print(picFullpath)
+
     try:
         save = 0
         if m == 'p':
@@ -62,7 +62,6 @@ def getFile(ft, m = 'g', enable_proxy = False, tcode = 'vic8w2AM', proxy_string 
             
         imgContent = r1.content
         if len(imgContent) > 0 and save == 1:
-##            picFullpath = str(outdir + r'/' + picFilename)
             if os.path.exists(picFullpath) and os.path.isfile(picFullpath) and os.access(picFullpath,os.R_OK):
                 print('file exist, skip')
             else:
@@ -74,48 +73,9 @@ def getFile(ft, m = 'g', enable_proxy = False, tcode = 'vic8w2AM', proxy_string 
         return 4
     return 1
 
-##    return picFilename,content
-
-def getFileT(myQueue,m,enable_proxy = False, proxy_string = {"http":"127.0.0.1:8787","https":"127.0.0.1:8787","socks":"127.0.0.1:1080"}):
-    "线程函数"
-    proxies = {}
-    timeout = 15
-
-    #print(m)
-##    picFilename = ''
-
-    while True:
-        try:
-            imgLink = myQueue.get_nowait()
-            j = myQueue.qsize()
-        except Exception as e:
-            break
-        
-##    picFilename = imgLink[imgLink.rfind('/')+1:len(imgLink)]
-        try:
-            getFile(fileLink=imgLink['link'],fileName=imgLink['ofile'],outdir=imgLink['oDir'],m=m)
-        except Exception as e:
-            print('error:',e)
-
-
 def getFiles(fileList,m):
     #fileList:[{'link':fullurl,'ofile':outPutfilename,'oDir':outdir},]
-##    for item in fileList:
-##        filesQueue.put(item)
-##    threadN = 100
-##    jqueue = filesQueue.qsize()
-##    if jqueue < threadN:
-##        threadN = jqueue
-##
-##    if jqueue > 0:
-##        threads = []
-##        for i in range(0,threadN):
-##            thread = threading.Thread(target = getFileT, args = (filesQueue,m,))
-##            threads.append(thread)
-##            thread.start()
-##        for thread1 in threads:
-##            thread1.join()
-
+    #m:请求方式 "g"et 或者 "p"ost
     with ThreadPoolExecutor(max_workers=50) as pool:
         [pool.submit(getFile,item,m) for item in fileList]
 

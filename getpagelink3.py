@@ -7,18 +7,20 @@ from bs4 import BeautifulSoup
 import requests
 import re
 from pStr3 import refineString,removeSstr
-pattern = re.compile("[.*M]")
-pattern2 = re.compile("[.*G]")
+##pattern = re.compile("[.*M]")
+##pattern2 = re.compile("[.*G]")
+
 headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36'}
 
-def getlink_list(my_page='https://www.aisex.com/bt/thread.php?fid=16&page=1',page_host = u'www.aisex.com',enable_proxy = False, proxy_string = {"http":"127.0.0.1:8787","https":"127.0.0.1:8787","socks":"127.0.0.1:1080"}):
-    "获取单个索引网页中帖子链接的列表"
-
-    page_prefix = "https://www.aisex.com/bt/"
+def getlink_list(page_url='https://www.aisex.com/bt/thread.php?fid=16&page=1',page_host = u'www.aisex.com',enable_proxy = False, proxy_string = {"http":"127.0.0.1:8787","https":"127.0.0.1:8787","socks":"127.0.0.1:1080"}):
+    "获取单个索引网页并获取网页中帖子链接的列表"
+    #page_url: 单个网页全url
+    page_prefix = "https://bt.aisex.com/bt/"
+    
     #page_no = "1"
     #full_page_address = page_prefix + "thread.php?fid=16&page=" + page_no
     try:
-        r1 = requests.get(my_page,headers = headers,timeout = 15)
+        r1 = requests.get(page_url,headers = headers,timeout = 15)
     except Exception as e:
         print('error',e)
 
@@ -27,9 +29,9 @@ def getlink_list(my_page='https://www.aisex.com/bt/thread.php?fid=16&page=1',pag
     soup = BeautifulSoup(content1,'html.parser')
     mytags_a = soup.find_all('a')
     #print 'A tags-----------'
-    link_list = []
-    link_dict = {}
-    linksList = []
+##    link_list = []
+##    link_dict = {}
+    linksList = [] #[{'title':bttitle,'link':myfull_link}，]
     n = 0
     for mytag_a in mytags_a:
         mytag_href = str(mytag_a.get('href'))
@@ -44,24 +46,29 @@ def getlink_list(my_page='https://www.aisex.com/bt/thread.php?fid=16&page=1',pag
                     #print 'the tag A is: %s' %unicode(mytag_a)
                     #print 'the href is: %s' %unicode(mytag_href)
                     myfull_link = page_prefix + mytag_href #内容页全地址full_Url
-                    link_list.append(myfull_link)
+                    #link_list.append(myfull_link)
                     mytorrent_filename = removeSstr(mytag_string)
                     mytorrent_filename = refineString(mytorrent_filename)
                     linksList.append({'title':mytorrent_filename,'link':myfull_link})
                     n = n+1
                     print('    ',n,'Refined Title: ',mytorrent_filename)
 
-                    link_dict[myfull_link] = mytorrent_filename #以赋值的方式生成字典{myfull_link:mytorrent_filename}
-    print('total %s links in this page: %s\n' %(n,my_page))
-    return linksList,link_dict
+##                    link_dict[myfull_link] = mytorrent_filename #以赋值的方式生成字典{myfull_link:mytorrent_filename}
+    print('total %s links in this page: %s\n' %(n,page_url))
+    return linksList#,link_dict
 
-def getLinksLists(indexPageS = 1,indexPageC = 2):
+def getLinksLists(indexPageNS = 1,indexPageC = 2):
     "获取所有索引网页中帖子链接的列表"
+    #indexPageNS: 索引页起始页码
+    #indexPageC: 索引页数量
+    
     prePage = 'https://bt.aisex.com/bt/thread.php?fid=16&page='
-    linksList = [] #内容 {'title':torrenttitle,'link':btpagefull_link}
-    for pageN in range(indexPageS,indexPageS+indexPageC):
-        curPage = prePage + str(pageN)
-        linksList_1,linkDict = getlink_list(my_page=curPage)
+    linksList = [] #[{'title':torrenttitle,'link':btpagefull_link},]
+    
+    for pageN in range(indexPageNS,indexPageNS+indexPageC):
+        curPage_url = prePage + str(pageN)
+##        linksList_1,linkDict = getlink_list(page_url=curPage_url)
+        linksList_1 = getlink_list(page_url=curPage_url)
         linksList = linksList + linksList_1
     return linksList
 

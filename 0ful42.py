@@ -13,7 +13,8 @@ from bs4 import BeautifulSoup
 import bencode  #解码torrent
 import io, sys, re
 
-import getpagelink3, gettorrentlink3, gettorrent3
+import getpagelink3
+#import gettorrentlink3, gettorrent3
 from getImg import getImg,getImgs
 #from getFiles import getFiles
 from getFileLinks2 import getTrAndImgs
@@ -66,7 +67,8 @@ def main():
 ##    link_dict = {} #link_dict:  {pagenumber:{fulllink:torrentfilename}}
 ##    link_count = 0
 ##    torrentItemList = []
-    linksList = getpagelink3.getLinksLists(indexPageS = firstpage_number,indexPageC = total_pages)
+    #获取indexPageC个索引页内的条目链接，返回值里的'title'后期没有使用
+    linksList = getpagelink3.getLinksLists(indexPageNS = firstpage_number,indexPageC = total_pages)#返回值[{'title':torrenttitle,'link':btpagefull_link},]
 ##    link_count = link_count + len(link_dict[mypage_number])
     print('Total links:', len(linksList))
     '''
