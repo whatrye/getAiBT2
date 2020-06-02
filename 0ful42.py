@@ -22,6 +22,7 @@ from getFileLinks2 import getTrAndImgs
 headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36'}
 
 def main():
+    start_time = time.time()
     reload(sys)
     #print u'系统默认编码：',sys.getdefaultencoding() #获取系统默认编码
     #sys.stdout = io.TextIOWrapper(sys.stdout.buffer,encoding='gb18030') #改变标准输出的默认编码
@@ -269,7 +270,8 @@ def main():
 ####                    print('torrent_code not exist!')
 ####
 ####    print(torrentItemList)
-    print('over')
+    end_time = time.time()
+    print('over',end_time-start_time,'s')
 
 if __name__ == '__main__':
     #print __name__
