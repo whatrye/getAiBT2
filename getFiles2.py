@@ -54,7 +54,8 @@ def getFile(ft, m = 'g', enable_proxy = False, tcode = 'vic8w2AM', proxy_string 
         elif m == 'g':
             #print('start get img ',picFilename)
             try:
-                r1 = requests.get(fileLink, headers = headers,proxies = proxies,timeout = timeout)
+                fileLinkHttps = fileLink.replace('http://','https://')
+                r1 = requests.get(fileLinkHttps, headers = headers,proxies = proxies,timeout = timeout)
             except Exception as e:
                 print('error:',e)
                 return 3
